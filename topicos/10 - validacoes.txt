@@ -1,0 +1,162 @@
+====================================================================================================
+CURSO API REST SPRING BOOT - VALIDAÇÕES
+====================================================================================================
+
+
+Dependência
+----------------------------------------------------------------------------------------------------
+- Adicionar a seguinte dependência
+
+    ...
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>    
+    ...
+    
+
+Annotation
+----------------------------------------------------------------------------------------------------
+- Adicionar a annotation @Valid no endpoint 'insert'
+
+    ... 
+    @PostMapping
+    public ResponseEntity<Task> insert(@Valid @RequestBody Task task) {
+        return ResponseEntity.ok(service.insert(task));
+    }
+    ...
+
+
+Validação
+----------------------------------------------------------------------------------------------------
+- Adicionar a seguinte validação na classe 'Task'
+
+  @Size(min=5)
+  
+  
+Verificando
+----------------------------------------------------------------------------------------------------
+- Iniciar a aplicação
+
+- Iniciar o Postman
+
+- Enviar uma requisição POST com um payload onde o campo 'description' seja menor que 5.
+
+  Obs: O usuário receberá uma resposta contendo um 400 Bad Request. O usuário não saberá o motivo.
+  
+
+Melhorando a resposta
+----------------------------------------------------------------------------------------------------
+- Adicionar o método 'handleMethodArgumentNotValid' na classe 'ResponseEntityExceptionHandlerCustom'
+
+    ...
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+      ExceptionResponse exceptionResponse = new ExceptionResponse(status.value(), ex.getMessage());
+      return new ResponseEntity<>(exceptionResponse, status);
+    }
+    ...
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Iniciar a aplicação
+
+- Iniciar o Postman
+
+- Enviar uma requisição POST com um payload onde o campo 'description' seja menor que 5.
+
+  Obs: Agora o usuário recebe uma mensagem, mas é uma mensagem muito longa, dificultado o entendimento
+
+
+Customizando
+----------------------------------------------------------------------------------------------------
+- Alterar o método 'handleMethodArgumentNotValid' conforme abaixo
+
+    ...
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+      ExceptionResponse exceptionResponse = new ExceptionResponse(status.value(), "Validation Failed: " + ex.getBindingResult().toString());  
+      return new ResponseEntity<>(exceptionResponse, status);
+    }
+    ...
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Iniciar a aplicação
+
+- Iniciar o Postman
+
+- Enviar uma requisição POST com um payload onde o campo 'description' seja menor que 5.
+
+  Obs: Agora o usuário recebe uma mensagem mais amigável.
+
+
+Melhorando a mensagem customizada
+----------------------------------------------------------------------------------------------------
+- Adicionar o atributo 'message' na annotation @Size
+
+  message="Descrição deve ter pelo menos 5 caracteres"
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Iniciar a aplicação
+
+- Iniciar o Postman
+
+- Enviar uma requisição POST com um payload onde o campo 'description' seja menor que 5.
+
+  Obs: Agora o usuário recebe uma mensagem mais amigável.
+
+
+Mais validações
+----------------------------------------------------------------------------------------------------
+- Adicionar as seguintes validações na classe 'Task'
+
+    ...
+    @NotNull(message="O dado 'description' é obrigatório")
+    @Size(min=5, message="Descrição deve ter pelo menos 5 caracteres")
+    @Column(name = "description", length = 100, nullable = false)
+    private String description;
+    
+    @NotNull(message="O campo 'initial_date' é obrigatório")
+    @Column(name = "initial_date", nullable = false)
+    private LocalDateTime initialDate;
+    
+    @NotNull(message="O campo 'final_date' é obrigatório")
+    @Column(name = "final_date", nullable = false)
+    private LocalDateTime finalDate;
+    ...
+
+- Alterar o método 'handleMethodArgumentNotValid' conforme abaixo
+
+  ...
+  @Override
+  protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    // Get all errors
+    List<String> errors = ex.getBindingResult()
+        .getFieldErrors()
+        .stream()
+        .map(x -> x.getDefaultMessage())
+        .collect(Collectors.toList());
+
+    Map<String, Object> body = new LinkedHashMap<>();
+    body.put("error", status.value());
+    body.put("reason", errors);
+
+    return new ResponseEntity<>(body, headers, status);
+  }
+  ...
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Iniciar a aplicação
+
+- Iniciar o Postman
+
+- Enviar uma requisição POST com um payload onde o campo 'description' seja menor que 5 e o campo
+  initial_date nulo.
+

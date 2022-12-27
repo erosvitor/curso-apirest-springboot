@@ -1,0 +1,64 @@
+====================================================================================================
+CURSO API REST SPRING BOOT - INSERINDO
+====================================================================================================
+
+
+Serviço
+----------------------------------------------------------------------------------------------------
+- Criar o pacote 'com.ctseducare.taskbook.service'
+
+- Criar o arquivo 'TaskService.java'
+
+@Service
+public class TaskService {
+
+    @Autowired
+    TaskRepository repository;
+    
+    public Task insert(Task task) {
+        return repository.save(task);
+    }
+    
+}
+
+
+Controller
+----------------------------------------------------------------------------------------------------
+- Alterar a classe 'TaskController.java' conforme abaixo.
+
+@RestController
+@RequestMapping(path = "/task")
+public class TaskController {
+
+    @Autowired
+    TaskService service;
+    
+    @PostMapping
+    public ResponseEntity<Task> insert(@RequestBody Task task) {
+        return ResponseEntity.ok(service.insert(task));
+    }
+
+}
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Iniciar a aplicação
+
+- Iniciar o Postman
+
+- Criar uma requisição POST
+
+  URL:
+  
+    http://localhost:8080/task
+  
+  Payload:
+  
+    {
+      "description": "Finalizar curso API REST com Spring Boot",
+      "initialDate": "2022-12-26T08:00:00",
+      "finalDate": "2022-12-29T18:00:00"
+    }
+
+

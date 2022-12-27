@@ -1,0 +1,44 @@
+====================================================================================================
+CURSO API REST SPRING BOOT - SELECIONANDO
+====================================================================================================
+
+
+Serviço
+----------------------------------------------------------------------------------------------------
+- Adicionar o método 'findAll' no arquivo 'TaskService.java'
+
+    ...
+    public List<Task> findAll() {
+        return repository.findAll();
+    }
+    ...
+    
+
+Controller
+----------------------------------------------------------------------------------------------------
+- Adicionar o endpoint 'findAll' na classe 'TaskController'
+
+    ...
+    @GetMapping
+    public ResponseEntity<List<Task>> findAll() {
+        return ResponseEntity.ok(service.findAll());
+    }
+    ...
+    
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Iniciar a aplicação
+
+- Iniciar o Postman
+
+- Criar uma requisição GET
+
+  URL:
+  
+    http://localhost:8080/task
+  
+  Payload:
+  
+    N.A.
+

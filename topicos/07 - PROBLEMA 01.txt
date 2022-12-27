@@ -1,0 +1,16 @@
+====================================================================================================
+CURSO API REST SPRING BOOT - PROBLEMA 01
+====================================================================================================
+
+
+Problema encontrado até o momento
+----------------------------------------------------------------------------------------------------
+- Os endpoints para alterar e excluir uma tarefa podem falhar devido a tarefa não existir.
+    
+
+Solução
+----------------------------------------------------------------------------------------------------
+- Verificar se a tarefa existe 
+- Disparar uma exceção caso a tarefa não exista
+
+

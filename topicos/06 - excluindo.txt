@@ -1,0 +1,46 @@
+====================================================================================================
+CURSO API REST SPRING BOOT - EXCLUINDO
+====================================================================================================
+
+
+Serviço
+----------------------------------------------------------------------------------------------------
+- Adicionar o método 'delete' no arquivo 'TaskService.java'
+
+    ...
+    public void delete(Integer id) {
+        repository.deleteById(id);
+    }
+    ...
+    
+
+Controller
+----------------------------------------------------------------------------------------------------
+- Adicionar o endpoint 'delete' na classe 'TaskController'
+
+    ...
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> delete(@PathVariable Integer id) {
+        service.delete(id);
+        return ResponseEntity.ok("Item excluído");
+    }
+    ...
+    
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Iniciar a aplicação
+
+- Iniciar o Postman
+
+- Criar uma requisição DELETE
+
+  URL:
+  
+    http://localhost:8080/task/{TASK-ID}
+  
+  Payload:
+  
+    N.A.
+
+

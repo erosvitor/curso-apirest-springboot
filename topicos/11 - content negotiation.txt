@@ -1,0 +1,132 @@
+====================================================================================================
+CURSO API REST SPRING BOOT - CONTENT NEGOTIATION
+====================================================================================================
+
+
+Dependência para conteúdo XML
+----------------------------------------------------------------------------------------------------
+- Adicionar a seguinte dependência
+
+    ...
+    <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-xml</artifactId>
+    </dependency>
+    ...
+
+
+Configurando o content negotiation
+----------------------------------------------------------------------------------------------------
+- Criar o pacote 'com.ctseducare.taskbook.config'
+
+- Criar o arquivo 'WebConfig.java'
+
+@Configuration
+@EnableWebMvc
+public class WebConfig implements WebMvcConfigurer {
+
+    // VIA QUERY PARAMETER
+    @Override
+    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+        configurer
+          .favorParameter(true)
+          .parameterName("mediaType")
+          .ignoreAcceptHeader(true)
+          .useRegisteredExtensionsOnly(false)
+          .defaultContentType(MediaType.APPLICATION_JSON)
+          .mediaType("json", MediaType.APPLICATION_JSON)
+          .mediaType("xml", MediaType.APPLICATION_XML);
+    }
+
+}
+
+- Adicionar as seguintes annotations nos atributos do tipo LocalDate na classe 'Task.java'
+
+    @JsonFormat(pattern = "yyyy-MM-dd") 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+
+
+Recebendo o content negotiation
+----------------------------------------------------------------------------------------------------
+- Alterar os endpoints conforme abaixo
+
+    ...
+    @PostMapping(consumes = { "application/json", "application/xml" }, produces = { "application/json", "application/xml" })
+    public ResponseEntity<Task> insert(@Valid @RequestBody Task task) {
+        return ResponseEntity.ok(service.insert(task));
+    }
+    
+    @GetMapping(produces = { "application/json", "application/xml" })
+    public ResponseEntity<List<Task>> findAll() {
+        return ResponseEntity.ok(service.findAll());
+    }
+
+    @PutMapping(consumes = { "application/json", "application/xml" }, produces = { "application/json", "application/xml" })
+    public ResponseEntity<Task> update(@RequestBody Task task) {
+        return ResponseEntity.ok(service.update(task));
+    }
+    
+    @DeleteMapping(path = "/{id}", produces = { "application/json", "application/xml" })
+    public ResponseEntity<String> delete(@PathVariable Integer id) {
+        service.delete(id);
+        return ResponseEntity.ok("Item excluído");
+    }
+    ...
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Iniciar a aplicação
+
+- Iniciar o Postman
+
+- Enviar uma requisição POST com conteúdo XML
+
+  ...
+  <item>
+    <description>Finalizar curso API REST com Spring Boot</description>
+    <initialDate>2022-12-26</initialDate>
+    <finalDate>2022-12-29</finalDate>
+  </item>
+  ...
+
+- Enviar uma requisição GET informando o tipo (XML ou JSON) dos dados retornados
+
+  http://localhost:8080/task?mediaType=xml
+
+
+Content negotiation via header parameter
+----------------------------------------------------------------------------------------------------
+- Alterar o método 'configureContentNegotiation' da classe 'WebConfig' conforme abaixo
+
+    ...
+    @Override
+    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+      configurer
+        .favorParameter(false)
+        .ignoreAcceptHeader(false)
+        .useRegisteredExtensionsOnly(false)
+        .defaultContentType(MediaType.APPLICATION_JSON)
+        .mediaType("json", MediaType.APPLICATION_JSON)
+        .mediaType("xml", MediaType.APPLICATION_XML);  
+    }
+    ...
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Iniciar a aplicação
+
+- Iniciar o Postman
+
+- Enviar uma requisição GET contendo um header parameter conforme abaixo
+
+  Accept = application/json
+  
+    ou
+    
+  Accept = application/xml
+
+
+  
+

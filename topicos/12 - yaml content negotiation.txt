@@ -1,0 +1,83 @@
+====================================================================================================
+CURSO API REST SPRING BOOT - YAML CONTENT NEGOTIATION
+====================================================================================================
+
+
+Dependência para conteúdo YAML
+----------------------------------------------------------------------------------------------------
+- Adicionar a seguinte dependência
+
+    ...
+    <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-yaml</artifactId>
+    </dependency>
+    ...
+
+
+YAML converter
+----------------------------------------------------------------------------------------------------
+- Criar o pacote 'com.ctseducare.taskbook.yaml'
+
+- Criar o arquivo 'YamlJackson2HttpMessageConverter.java'
+
+public final class YamlJackson2HttpMessageConverter extends AbstractJackson2HttpMessageConverter {
+
+    public YamlJackson2HttpMessageConverter() {
+        super(new YAMLMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL), MediaType.parseMediaType("application/x-yaml"));
+    }
+
+}
+
+
+Configurando o YAML content negotiation
+----------------------------------------------------------------------------------------------------
+- Adicionar o método 'extendMessageConverters' na classe 'WebConfig'
+
+    ...
+    public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+        converters.add(new YamlJackson2HttpMessageConverter());
+    }
+    ...
+
+- Alterar o método 'configureContentNegotiation' conforme abaixo
+
+    ...
+    @Override
+    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+      configurer
+        .favorParameter(false)
+        .ignoreAcceptHeader(false)
+        .useRegisteredExtensionsOnly(false)
+        .defaultContentType(MediaType.APPLICATION_JSON)
+        .mediaType("json", MediaType.APPLICATION_JSON)
+        .mediaType("xml", MediaType.APPLICATION_XML)
+        .mediaType("x-yaml", MediaType.valueOf("application/x-yaml"));
+    }
+    ...
+
+- Adicionar 'application/x-yaml' em todos os 'consumers' e 'producers' nos endpoints
+
+- Adicionar as seguintes annotations em todos os atributos do tipo LocalDate
+
+  @JsonSerialize(using = LocalDateSerializer.class)
+  @JsonDeserialize(using = LocalDateDeserializer.class)
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Iniciar a aplicação
+
+- Iniciar o Postman
+
+- Enviar uma requisição POST com conteúdo YAML
+
+  ---
+  description: Finalizar curso API REST com Spring Boot
+  initialDate: 2022-12-26
+  finalDate: 2022-12-29
+  
+  Dica1: O Postman não suporte YAML. O payload deve ser do tipo 'raw' e 'text'.
+  Dica2: Adicionar o header Content-type = application/yaml
+
+
