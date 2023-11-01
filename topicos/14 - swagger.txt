@@ -1,0 +1,166 @@
+====================================================================================================
+CURSO API REST SPRING BOOT - SWAGGER
+====================================================================================================
+
+
+Dependência
+----------------------------------------------------------------------------------------------------
+- Adicionar a dependência
+
+    ...
+    <dependency>
+      <groupId>org.springdoc</groupId>
+      <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+      <version>2.2.0</version>
+    </dependency>
+    ...
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Reiniciar a aplicação
+
+- Utilizando um navegador de Internet
+
+  http://localhost:8080/swagger-ui/index.html
+
+  OBS: A documentação padrão do Swagger será exibida
+
+
+Customizando as informações gerais da API
+----------------------------------------------------------------------------------------------------
+- Criar o pacote 'com.ctseducare.task.config'
+
+- Criar a classe 'OpenAPIConfig.java'
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
+
+@Configuration
+public class OpenAPIConfig {
+
+  @Bean
+  public OpenAPI openAPI() {
+    Contact contact = new Contact();
+    contact.setName("Eros Vitor Bornatowski");
+    contact.setEmail("erosborna@gmail.com");
+    contact.setUrl("https://github.com/erosvitor");
+
+    License mitLicense = new License().name("MIT License").url("https://choosealicense.com/licenses/mit/");
+
+    Info info = new Info()
+		.title("API para gerenciamento de tarefas")
+		.description("Esta API disponibiliza recursos para gerenciamento de tarefas.")
+		.version("1.0")
+		.contact(contact)
+		.termsOfService("https://www.ctseducare.com/terms")
+		.license(mitLicense);
+
+    return new OpenAPI().info(info);
+  }
+
+}
+
+
+Customizando o nome da API
+----------------------------------------------------------------------------------------------------
+- Acrescentar a seguinte linha abaixo da annotation @RestController na classe TaskController
+
+  @Tag(name = "Task", description = "Registro, Listagem, Alteração e Remoção de tarefas")
+
+
+Customizando os media types dos endpoints
+----------------------------------------------------------------------------------------------------
+- Alterar os verbos da classe 'TaskController.java' conforme abaixo
+
+  ...
+  @PostMapping(consumes = "application/json", produces = "application/json")
+  
+  @GetMapping(produces = "application/json")
+  
+  @PutMapping(consumes = "application/json", produces = "application/json")
+  
+  @DeleteMapping(path = "/{id}", produces="text/plain")
+  ...
+
+
+Customizando a descrição dos endpoints
+----------------------------------------------------------------------------------------------------
+- Alterar os verbos da classe 'TaskController.java' conforme abaixo
+
+  ...
+  @PostMapping(consumes = "application/json", produces = "application/json")
+  @Operation(summary = "Registra uma tarefa", description = "Após a tarefa ser registrada é retornado os dados da tarefa com o identificador preenchido.")
+  public ResponseEntity<Task> insert(@Valid @RequestBody Task task) {
+  ...
+    
+  @GetMapping(produces = "application/json")
+  @Operation(summary = "Lista tarefas registradas.", description = "Listagem das tarefas previamente registradas.")
+  public ResponseEntity<List<Task>> findAll() {
+  ...
+    
+  @PutMapping(consumes = "application/json", produces = "application/json")
+  @Operation(summary = "Altera dados de uma tarefa", description = "Após os dados serem alterados é retornado os dados da tarefa atualizados.")
+  public ResponseEntity<Task> update(@Valid @RequestBody Task task) {
+  ...
+    
+  @DeleteMapping(path = "/{id}", produces="text/plain")
+  @Operation(summary = "Remove uma tarefa", description="Após a tarefa ser removida é retornado um status informando que a tarefa foi removida.")
+  public ResponseEntity<String> delete(@PathVariable Integer id) {
+  ...
+
+
+Customizando a resposta dos endpoints
+----------------------------------------------------------------------------------------------------
+- Alterar os verbos da classe 'TaskController.java' conforme abaixo
+
+    @PostMapping(consumes = "application/json", produces = "application/json")
+    @Operation(summary = "Registra uma tarefa", description = "Após a tarefa ser registrada é retornado os dados da tarefa com o identificador preenchido.")
+    @ApiResponses(
+    	value = {
+            @ApiResponse(responseCode = "200", description = "Dados da tarefa com o identificador preenchido", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Task.class))),
+            @ApiResponse(responseCode = "400", description = "Erro informando problemas com os dados da requisição", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))),
+        }
+    )
+    public ResponseEntity<Task> insert(@Valid @RequestBody Task task) {
+    ...
+    
+    @GetMapping(produces = "application/json")
+    @Operation(summary = "Lista tarefas registradas.", description = "Listagem das tarefas previamente registradas.")
+    @ApiResponses(
+       	value = {
+            @ApiResponse(responseCode = "200", description = "Lista contendo as tarefas", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Task.class))))
+        }
+    )
+    public ResponseEntity<List<Task>> findAll() {
+    ...
+    
+    @PutMapping(consumes = "application/json", produces = "application/json")
+    @Operation(summary = "Altera dados de uma tarefa", description = "Após os dados serem alterados é retornado os dados da tarefa atualizados.")
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "200", description = "Dados da tarefa atualizados", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Task.class))),
+            @ApiResponse(responseCode = "400", description = "Erro informando problemas com os dados da requisição e/ou informando que a tarefa não existe.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))),
+        }
+    )
+    public ResponseEntity<Task> update(@Valid @RequestBody Task task) {
+    ...
+    
+    @DeleteMapping(path = "/{id}", produces="text/plain")
+    @Operation(summary = "Remove uma tarefa", description="Após a tarefa ser removida é retornado um status informando que a tarefa foi removida.")
+    @ApiResponses(
+      	value = {
+            @ApiResponse(responseCode = "200", description = "Status informando que a tarefa com removida", content = @Content(mediaType = "text/plain", schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "400", description = "Erro informando que a tarefa não existe.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))),
+        }
+    )
+    public ResponseEntity<String> delete(@PathVariable Integer id) {
+    ...
+
+
+

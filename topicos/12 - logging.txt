@@ -1,0 +1,233 @@
+====================================================================================================
+CURSO API REST SPRING BOOT - LOGGING
+====================================================================================================
+
+
+Dependência
+----------------------------------------------------------------------------------------------------
+- Retirar a dependência padrão do LogBack
+
+    ...
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+      <exclusions>
+        <exclusion>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-logging</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    ...
+
+- Adicionar a dependência do Log4J2
+
+    ...
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-log4j2</artifactId>
+    </dependency>
+    ...
+
+
+Objeto 'logger'
+----------------------------------------------------------------------------------------------------
+- Criar o objeto 'logger' na classe TaskService
+
+    ...
+    Logger logger = LoggerFactory.getLogger(TaskService.class);
+    ...
+
+- Alterar o método 'update' conforme abaixo
+
+    ...
+    public Task update(Task task) {
+    	Optional<Task> taskInRepository = repository.findById(task.getId());
+    	if (!taskInRepository.isPresent()) {
+    		logger.error("Task does not exist!");
+    		throw new ResourceNotFoundException("Task does not exist!");
+    	}
+        return repository.save(task);
+    }
+    ...
+
+- Alterar o método 'delete' conforme abaixo
+
+    ...
+    public void delete(Integer id) {
+    	Optional<Task> taskInRepository = repository.findById(id);
+    	if (!taskInRepository.isPresent()) {
+    		logger.error("Task does not exist!");
+    		throw new ResourceNotFoundException("Task does not exist!");
+    	}
+    	repository.deleteById(id);
+    }
+    ...
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Reiniciar a aplicação
+
+- Utilizando o Postman
+
+  - Realizar a requisição para excluir uma despesa que não exista
+
+    Obs1: O usuário receberá a seguinte resposta:
+  
+      {
+	"error": 404,
+	"reason": "Task does not exist!"
+      }
+    
+    Obs2: No console será exibida a seguinte mensagem:
+  
+      2023-09-22T10:32:25.032-03:00 ERROR 379733 --- [nio-8080-exec-2] c.c.t.s.TaskService : Task does not exist!
+
+
+Customizando as mensagens no console
+----------------------------------------------------------------------------------------------------
+- Criar o arquivo 'log4j2.xml' no folder 'src/main/resources'
+
+<Configuration>
+  <Appenders>
+    <Console name="LogToConsole" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %p %c: %m%n"/>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <Root level="ERROR">
+      <AppenderRef ref="LogToConsole"/>
+    </Root>
+  </Loggers>
+</Configuration>
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Reiniciar a aplicação
+
+- Utilizando o Postman
+
+  - Realizar a requisição para excluir uma despesa que não exista
+
+    Obs1: O usuário receberá a seguinte resposta:
+  
+      {
+	"error": 404,
+	"reason": "Task does not exist!"
+      }
+    
+    Obs2: No console será exibida a seguinte mensagem:
+  
+      2023-09-22 10:35:38.781 ERROR com.ctseducare.taskbook.service.TaskService: Task does not exist!
+
+
+Enviando as mensagens para arquivo em disco
+----------------------------------------------------------------------------------------------------
+- Alterar o arquivo 'log4j2.xml' conforme abaixo
+
+<Configuration>
+  <Appenders>
+    <Console name="LogToConsole" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %p %c: %m%n"/>
+    </Console>
+    <File name="LogToFile" fileName="/var/log/taskbook/taskbook.log">
+      <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %p %c: %m%n"/>
+    </File>
+  </Appenders>
+  <Loggers>
+    <Root level="ERROR">
+      <AppenderRef ref="LogToConsole"/>
+      <AppenderRef ref="LogToFile"/>
+    </Root>
+  </Loggers>
+</Configuration>
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Reiniciar a aplicação
+
+- Utilizando o Postman
+
+  - Realizar a requisição para excluir uma despesa que não exista
+
+    Obs1: O usuário receberá a seguinte resposta:
+  
+      {
+	"error": 404,
+	"reason": "Task does not exist!"
+      }
+    
+    Obs2: No console será exibida a seguinte mensagem:
+  
+      2023-09-22 10:35:38.781 ERROR com.ctseducare.taskbook.service.TaskService: Task does not exist!
+
+    Obs3: Será gerado um arquivo chamado 'taskbook.log' no diretório '/var/log/taskbook' contendo as mensagens de erro
+
+
+Rotacionando a geração do arquivo em disco
+----------------------------------------------------------------------------------------------------
+- Substituir o appender 'File' pelo appender 'RollingFile'
+
+  ...
+  <RollingFile name="LogToRollingFile" fileName="/var/log/taskbook/taskbook.log" filePattern="/var/log/taskbook/taskbook.log.%d{yyyy-MM-dd}-%i.gz">
+    <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %p %c: %m%n"/>
+    <Policies>
+      <TimeBasedTriggeringPolicy/>
+      <SizeBasedTriggeringPolicy size="10 MB"/>
+    </Policies>
+  </RollingFile>
+  ...
+  
+  Obs: O arquivo de log será rotacionado diariamente ou quando o tamanho do arquivo atingir 10MB.
+
+- Ajustar o referência de 'LogToFile' para 'LogToRollingFile'
+
+  ...
+  <AppenderRef ref="LogToRollingFile"/>
+  ...
+
+
+Utilizando propriedades para nome do diretório e nome do log
+----------------------------------------------------------------------------------------------------
+- Alterar o arquivo 'log4j2.xml' conforme abaixo
+
+<Configuration>
+  <Properties>
+    <Property name="log-dir">/var/log/taskbook</Property>
+    <Property name="log-name">taskbook.log</Property>
+  </Properties>
+  <Appenders>
+    <Console name="LogToConsole" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %p %c: %m%n"/>
+    </Console>
+    <RollingFile name="LogToRollingFile" fileName="${log-dir}/${log-name}" filePattern="${log-dir}/${log-name}.%d{yyyy-MM-dd}-%i.gz">
+      <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %p %c: %m%n"/>
+      <Policies>
+        <TimeBasedTriggeringPolicy/>
+        <SizeBasedTriggeringPolicy size="10 MB"/>
+      </Policies>
+    </RollingFile>
+  </Appenders>
+  <Loggers>
+    <Root level="ERROR">
+      <AppenderRef ref="LogToConsole"/>
+      <AppenderRef ref="LogToRollingFile"/>
+    </Root>
+  </Loggers>
+</Configuration>
+
+
+Quantidade de arquivos por dia
+----------------------------------------------------------------------------------------------------
+- A quantidade padrão de arquivos por dia é 7. Para alterar essa quantidade pode-se utilizar a
+  configuração 'DefaultRolloverStrategy'
+  
+  ...
+  <DefaultRolloverStrategy max="10"/>
+  ...
+  
+  Obs: A configuração deve estar abaixo de '</Policies>'
+

@@ -1,0 +1,188 @@
+====================================================================================================
+CURSO API REST SPRING BOOT - VALIDAÇÕES
+====================================================================================================
+
+
+Dependência
+----------------------------------------------------------------------------------------------------
+- Adicionar a seguinte dependência
+
+    ...
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>    
+    ...
+    
+
+Annotation
+----------------------------------------------------------------------------------------------------
+- Adicionar a annotation @Valid no endpoint 'insert' e 'update'
+
+    ... 
+    @PostMapping
+    public ResponseEntity<Task> insert(@Valid @RequestBody Task task) {
+        return ResponseEntity.ok(service.insert(task));
+    }
+    ...
+    
+    ...
+    @PutMapping
+    public ResponseEntity<Task> update(@Valid @RequestBody Task task) {
+        return ResponseEntity.ok(service.update(task));
+    }
+    ...
+
+
+Validação
+----------------------------------------------------------------------------------------------------
+- Adicionar a seguinte validação no campo 'description' da classe 'Task'
+
+  ...
+  @Size(min=5)
+  private String description;
+  ...
+  
+  
+Verificando
+----------------------------------------------------------------------------------------------------
+- Reiniciar a aplicação
+
+- Utilizando o Postman
+
+  - Enviar uma requisição POST com um payload onde o campo 'description' seja menor que 5.
+
+    RESPOSTA:
+  
+    {
+      "type": "about:blank",
+      "title": "Bad Request",
+      "status": 400,
+      "detail": "Invalid request content.",
+      "instance": "/task"
+    }
+  
+
+Melhorando a resposta
+----------------------------------------------------------------------------------------------------
+- Adicionar o método 'handleMethodArgumentNotValid' na classe 'ResponseEntityExceptionHandlerCustom'
+
+    ...
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(status.value(), ex.getBindingResult().getAllErrors().get(0).getDefaultMessage());
+        return new ResponseEntity<>(exceptionResponse, status);
+    }
+    ...
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Reiniciar a aplicação
+
+- Utilizando o Postman
+
+  - Enviar uma requisição POST com um payload onde o campo 'description' seja menor que 5.
+
+    RESPOSTA:
+  
+    {
+      "error": 400,
+      "reason": "size must be between 5 and 2147483647"
+    }
+
+
+Customizando a resposta
+----------------------------------------------------------------------------------------------------
+- Adicionar o atributo 'message' na annotation @Size
+
+  message="Descrição deve ter pelo menos 5 caracteres"
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Reiniciar a aplicação
+
+- Iniciar o Postman
+
+- Enviar uma requisição POST com um payload onde o campo 'description' seja menor que 5.
+
+  RESPOSTA:
+  
+  {
+    "error": 400,
+    "reason": "Descrição deve ter pelo menos 5 caracteres"
+  }
+
+
+Mais validações
+----------------------------------------------------------------------------------------------------
+- Adicionar as seguintes validações na classe 'Task'
+
+    ...
+    @Column(name = "description", length = 100, nullable = false)
+    @Size(min=5, message="Descrição deve ter pelo menos 5 caracteres")
+    @NotNull(message="O campo 'description' é obrigatório")
+    private String description;
+    
+    @Column(name = "initial_date", nullable = false)
+    @NotNull(message="O campo 'initial_date' é obrigatório")
+    private LocalDateTime initialDate;
+    
+    @Column(name = "final_date", nullable = false)
+    @NotNull(message="O campo 'final_date' é obrigatório")
+    private LocalDateTime finalDate;
+    ...
+
+- Alterar o método 'handleMethodArgumentNotValid' conforme abaixo
+
+  ...
+  @Override
+  protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+    // Get all errors
+    List<String> errors = ex.getBindingResult().getFieldErrors().stream().map(x -> x.getDefaultMessage()).collect(Collectors.toList());
+
+    /*
+     *  A ordem das mensagens de erro referentes a validação dos campos é aleatória. Isto dificulta a criação de testes unitários, uma vez que as mensagens
+     *  são retornadas num vetor de strings e nos testes temos que pegar posição por posição do vetor e validar individualmente.
+     *  
+     *  Exemplo:
+     *  
+     *    ResultActions response = mockMvc.perform(request);
+     *    response
+     *      .andExpect(status().is(400))
+     *      .andExpect(jsonPath("$.reason[0]", containsString("Descrição deve ter pelo menos 5 caracteres")))
+     *      .andExpect(jsonPath("$.reason[1]", containsString("O campo 'final_date' é obrigatório")));
+     *      
+     */
+    Collections.sort(errors);
+		
+    Map<String, Object> body = new LinkedHashMap<>();
+    body.put("error", status.value());
+    body.put("reason", errors);
+
+    return new ResponseEntity<>(body, headers, status);
+  }
+  ...
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Reiniciar a aplicação
+
+- Utilizando o Postman
+
+  - Enviar uma requisição POST com um payload onde o campo 'description' seja menor que 5 e o campo
+    initial_date nulo.
+
+    RESPOSTA:
+  
+    {
+      "error": 400,
+      "reason": [
+          "Descrição deve ter pelo menos 5 caracteres",
+          "O campo 'initial_date' é obrigatório"
+      ]
+    }
+
+

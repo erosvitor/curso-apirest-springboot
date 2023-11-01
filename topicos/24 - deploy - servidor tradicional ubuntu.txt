@@ -1,0 +1,68 @@
+====================================================================================================
+CURSO API REST SPRING BOOT - DEPLOY - SERVIDOR TRADICIONAL UBUNTU
+====================================================================================================
+
+
+Preparando o servidor
+----------------------------------------------------------------------------------------------------
+- Instalar a versão desejada do Ubuntu Server numa máquina física ou virtual
+
+- Atualizar o sistema operacional
+
+  $ sudo apt update
+  $ sudo apt update
+
+- Instalar o servidor de SSH
+
+  $ sudo apt install openssh-server
+
+  Obs: O servidor SSH será utilizado para transferência de arquivos
+  
+
+Preparando o banco de dados
+----------------------------------------------------------------------------------------------------
+- Instalar o MySQL Server 8.x
+
+- Criar o banco de dados
+
+CREATE DATABASE taskbook;
+
+USE taskbook;
+
+CREATE TABLE tasks (
+  id INTEGER NOT NULL AUTO_INCREMENT,
+  description VARCHAR(100) NOT NULL,
+  initial_date DATETIME NOT NULL,
+  final_date DATETIME NOT NULL,
+  PRIMARY KEY (id)
+);
+
+
+Preparando o Java
+----------------------------------------------------------------------------------------------------
+- Instalar o Oracle JRE 17 ou OpenJDK JRE 17
+
+
+Disponibilizando a aplicação
+----------------------------------------------------------------------------------------------------
+- Criar um diretório para armazenar a aplicação
+
+- Transferir o arquivo 'taskbook-0.0.1-SNAPSHOT.jar' para o diretório
+
+- Criar o diretório de logs da aplicação
+
+  $ sudo mkdir /var/log/taskbook
+  $ chown $USER:$USER /var/log/taskbook
+
+- Executar a aplicação com o comando abaixo
+
+  java -jar <diretório>/taskbook-0.0.1-SNAPSHOT.jar
+
+  Obs: O Spring Boot anexa por padrão o servidor de aplicação Tomcat no arquivo JAR gerado no
+       processo de build. Isso dispensa a necessidade de instalar um servidor de aplicação no
+       servidor onde a aplicação será executada.
+         
+- Acessar documentação Swagger
+
+  http://<ip-servidor>:8080/swagger-ui/index.html
+

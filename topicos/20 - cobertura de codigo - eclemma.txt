@@ -1,0 +1,21 @@
+====================================================================================================
+CURSO API REST SPRING BOOT - COBERTURA DE CÓDIGO - ECLEMMA
+====================================================================================================
+
+
+Plugin Eclemma
+----------------------------------------------------------------------------------------------------
+- Selecionar menu 'Help', 'Eclipse Marketplace'
+
+- No campo 'Find' digitar 'Eclemma' e clicar no ícone para pesquisar
+
+- Clicar no botão 'Install' do item que será exibido
+
+  Obs: Será necessário reiniciar o Eclipse
+
+
+Cobertura do código
+----------------------------------------------------------------------------------------------------
+- Selecionar o folder 'src/test/java', botão direito, selecionar 'Coverage as', opção 'JUnit Test'
+  
+

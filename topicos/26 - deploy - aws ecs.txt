@@ -1,0 +1,285 @@
+====================================================================================================
+CURSO API REST SPRING BOOT - DEPLOY - AWS ECS
+====================================================================================================
+
+
+Criando um security group específico para o banco de dados
+----------------------------------------------------------------------------------------------------
+- Logar no console da AWS
+
+- Acessar o serviço 'Security Groups'
+
+- No Painel do serviço 'Security Groups' clicar no botão 'Create Securty group'
+
+- Na sessão 'Basic details' preencher os seguintes campos
+
+  - Security group name: sg_db_taskbook
+  
+  - Description: Security group for taskbook database
+  
+  - VPC: Selecionar a default
+
+- Na sessão 'Inbound rules' clicar no botão 'Add rule' e preencher os campos
+
+  - Type: Custom TCP
+  - Port range: 3306
+  - Source: Anywhere-IPv4
+
+- Clicar no botão 'Create security group'
+  
+
+Criando o banco de dados MySQL na AWS
+----------------------------------------------------------------------------------------------------
+- Acessar o serviço RDS
+
+- Selecionar o item 'Databases' e depois clicar no botão 'Create Database'
+
+- Na sessão 'Engine Type' selecionar 'MySQL'
+
+- Na sessão 'Templates' selecionar 'Free tier'
+
+- Na sessão 'Settings'
+
+  - No campo 'DB Instance identifier' colocar 'taskbook'
+  
+  - No campo 'Master username' colocar 'root'
+  
+  - No campo 'Master password' colocar 'rootroot'
+  
+- Na sessão 'Instance configuration' selecionar 'db.t2.micro'
+
+- Na sessão 'Storage', expandir o item 'Storage autoscaling' e desmarcar a opção 'Enable storage autoscaling'
+
+- Na sessão 'Connectivity'
+
+  - No campo 'Public access' selecionar 'Yes'
+  
+  - No campo 'Existing VPC security groups' selecionar o 'sg_db_taskbook'
+
+- Na sessão 'Database authentication' selecionar a opção 'Password authentication'
+
+- Na sessão 'Monitoring' desmarcar a opção 'Enable Enhanced monitoring'
+
+- Expandir o item 'Additional configuration'
+
+- Na sessão 'Database options'
+
+  - No campo 'Initial database name' colocar 'taskbook'
+
+- Na sessão 'Backup' desmarcar a opção 'Enable automated backups'
+
+- Na sessão 'Log exports' não selecionar nenhuma opção
+
+- Na sessão 'Maintanance' desmarcar a opção 'Enable auto minor version upgrade'
+
+- Clicar no botão 'Create database'
+
+  Obs: Aguarde o banco de dados ser criado. O processo leva alguns minutos.
+
+
+Criando a estrutura do banco de dados
+----------------------------------------------------------------------------------------------------
+- No AWS Console, painel 'Databases', clicar no nome do banco de dados recém criado
+
+- Localizar a sessão 'Endpoint & port'
+
+- Copiar o endereço que está no campo 'Endpoint'
+
+- Utilizando alguma ferramenta para administrar MySQL (DBeaver, MySQL Workbench, por exemplo) criar
+  uma conexão para o banco de dados
+
+  host: <host-copiado-da-sessao-endpoint>
+  
+  port: 3306
+  
+  database: taskbook
+
+- Abrir o editor SQL e executar o script abaixo
+
+  CREATE TABLE tasks (
+    id INTEGER NOT NULL AUTO_INCREMENT,
+    description VARCHAR(100) NOT NULL,
+    initial_date DATETIME NOT NULL,
+    final_date DATETIME NOT NULL,
+    PRIMARY KEY (id)
+  );
+
+
+Ajustando a aplicação para utilizar o banco de dados na AWS
+----------------------------------------------------------------------------------------------------
+- No arquivo 'application.yml' alterar os campos 'url' e 'password' conforme abaixo
+
+  spring:
+    datasource:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://<host-copiado-da-sessao-endpoint>:3306/taskbook
+      username: root
+      password: rootroot
+      ...
+
+- Executar a aplicação
+
+- Utilizando o Postman (ou outra ferramenta similar) inserir uma tarefa
+
+- Utilizando alguma ferramenta de banco de dados verificar se a tarefa foi inserida corretamente
+
+
+Criando a nova imagem Docker
+----------------------------------------------------------------------------------------------------
+- Compilar o projeto
+
+  $ mvn clean
+  $ mvn package
+  
+- Criar a imagem
+
+  $ docker compose up -d --build
+
+
+Criando usuário IAM para gerenciar a aplicação na AWS
+----------------------------------------------------------------------------------------------------
+- Acessar o serviço 'IAM'
+
+- No painel 'Users' clicar no botão 'Create user'
+
+- Na sessão 'User details' preencher o campo 'User name' com 'TASKBOOK_GITHUB_ACTIONS' e clicar no botão 'Next'
+
+- Na sessão 'Permissions options' clicar no item 'Attach policies directly'
+
+- Selecionar as policies
+
+  - AmazonEC2ContainerRegistryFullAccess
+  - AmazonECS_FullAccess
+  
+- Clicar no botão 'Next' e em seguida 'Create user'
+
+
+Instalando o AWS CLI
+----------------------------------------------------------------------------------------------------
+- Instalar o AWS CLI
+
+- Configurar o AWS CLI
+
+  $ aws configure
+  
+    AWS Access Key ID [None]: <informar a Access Key que está no arquivo CSV>
+    AWS Secret Access Key [None]: <informar a Secret Access Key que está no arquivo CSV>
+    Default region name [None]: sa-east-1
+    Default output format [None]: JSON
+
+
+Criando repositório ECR para armazenar a imagem Docker
+----------------------------------------------------------------------------------------------------
+- Acessar o serviço ECR
+
+- Na sessão 'Features' selecionar 'Repositories'
+
+- Clicar no botão 'Create repository'
+
+- Na sessão 'General settings' preencher o campo 'Repository name' com 'taskbook-ecr'
+
+- Clicar no botão 'Create repository'
+
+
+Enviando imagens para repositório ECR
+----------------------------------------------------------------------------------------------------
+- No painel 'Amazon ECR -> Repositories' clicar no nome do repositorio 'taskbook-ecr'
+
+- Clicar no botão 'View push commands'
+
+- Executar o comando do item 1 no prompt do sistema operacional para efetuar o login no AWS Console
+
+- Executar o comando do item 3 no prompt do sistema operacional para gerar uma imagem com tag
+
+- Executar o comando do item 4 no prompt do sistema operacional para enviar a imagem tageada
+
+- No painel 'Amazon ECR -> Repositories' clicar no ícone para dar um refresh na tela
+
+
+Criando um cluster ECS
+----------------------------------------------------------------------------------------------------
+- Acessar o serviço ECS
+
+- Clicar no botão 'Create cluster'
+
+- Na sessão 'Cluster configuration' preencher o campo 'Cluster name' com 'taskbook-cluster'
+
+- Na sessão 'Infrastructure' selecionar o item 'AWS Fargate (serverless)'
+
+- Clicar no botão 'Create'
+
+  OBS: Aguardar a criação do cluster
+
+  
+Criando uma task definition
+----------------------------------------------------------------------------------------------------
+- No painel do ECS selecionar o item 'Task definitions' e clicar no botão 'Create a new task definition'
+
+- Na sessão 'Task definition configuration' preencher o campo 'Task definition family' com 'taskbook-taskdefinition'
+
+- Na sessão 'Infrastructure requirements' preencher os campos
+
+  - Launch type: AWS Fargate
+  - Operating system/Architecture: Linux/X86-64
+  - Task size: CPU .5 vCPU Memory 1GB
+  - Task role: None
+  - Task execution role: Create new role
+
+- Na sessão 'Container' preencher os campos
+
+  - Name: taskbook-container
+  - Image URI: <colar a URI referente a imagem desejada lá do painel Amazon ECR -> Repositories>
+  - Container port: 8080
+  - CPU: 1
+  - GPU: 1
+  - Memory hard limit: 1GB
+  - Memory soft limit: 1GB
+
+- Desmarcar a opção 'Use log collection'
+
+- Clicar no botão 'Create'
+
+
+Executando a task definition
+----------------------------------------------------------------------------------------------------
+- No painel 'Task definitions' selecionar a task definition 'taskbook-taskdefinition'
+
+- Na opção 'Deploy' selecionar 'Run task'
+
+- Na sessão 'Environment' preencher os campos
+
+  - Existing cluster: taskbook-cluster
+  - Compute options: Capacity provider strategy
+  - Capaity provider: FARGATE
+  - Base: 1
+  - Weight: 1
+  - Plataform version: LATEST
+
+- Na sessão 'Deployment configuration' preencher os campos
+
+  - Desired tasks: 1
+
+- Na sessão 'Networking' preencher os campos
+
+  - VPC: <usar a vpc padrão>
+  - Subnets: <usar as subnets padrões>
+  - Security group: <criar um security group específico para o cluster>
+
+- Clicar no botão 'Create'
+
+  Obs: Aguardar a criação do container
+
+
+Accessando a aplicação
+----------------------------------------------------------------------------------------------------
+- No painel do ECS clicar em 'Clusters' e em seguida clicar em 'taskbook-cluster'
+
+- Clicar na aba 'Tasks' e clicar no link que esta na coluna 'Task'
+
+- Na sessão 'Configuration' localizar o campo 'Public IP'
+
+- Copiar o IP público e informar num navegador de Integer o seguinte:
+
+  http://<ip-publico>:8080/swagger-ui/index.html
+
+

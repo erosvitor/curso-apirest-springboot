@@ -1,0 +1,43 @@
+====================================================================================================
+CURSO API REST SPRING BOOT - COBERTURA DE CÓDIGO - SUREFIRE REPORT
+====================================================================================================
+
+
+Plugin Surefire Report para Maven
+----------------------------------------------------------------------------------------------------
+- Adicionar no 'pom.xml'
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <testFailureIgnore>true</testFailureIgnore>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <version>3.1.2</version>
+        <executions>
+          <execution>
+            <phase>test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+
+Exportando o relatório gerado pelo Surefire Report
+----------------------------------------------------------------------------------------------------
+- Para exportar 
+
+  $ mvn test
+  
+  OBS: O relatório será gerado no diretório 'site' dentro da pasta 'target'
+

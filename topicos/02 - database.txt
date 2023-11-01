@@ -1,0 +1,97 @@
+====================================================================================================
+CURSO API REST SPRING BOOT - DATABASE
+====================================================================================================
+
+
+Database
+----------------------------------------------------------------------------------------------------
+- Conectar no console do servidor do MySQL e executar os seguintes comandos:
+
+
+CREATE DATABASE taskbook;
+
+USE taskbook;
+
+CREATE TABLE tasks (
+  id INTEGER NOT NULL AUTO_INCREMENT,
+  description VARCHAR(100) NOT NULL,
+  initial_date DATETIME NOT NULL,
+  final_date DATETIME NOT NULL,
+  PRIMARY KEY (id)
+);
+
+
+Dependências
+----------------------------------------------------------------------------------------------------
+- Adicionar as dependências 
+
+  ...
+  <dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>8.0.33</version>
+  </dependency>
+  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jpa</artifactId>
+  </dependency>  
+  ...
+
+
+Acesso
+----------------------------------------------------------------------------------------------------
+- Criar o arquivo 'application.yml' no folder 'src/main/resources'
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/taskbook
+    username: root
+    password: root
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: none    
+
+
+Model
+----------------------------------------------------------------------------------------------------
+- Criar o pacote 'com.ctseducare.taskbook.model'
+
+- Criar o arquivo 'Task.java'
+
+@Entity
+@Table(name = "tasks")
+public class Task implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Integer id;
+    @Column(name = "description", length = 100, nullable = false)
+    private String description;
+    @Column(name = "initial_date", nullable = false)
+    private LocalDateTime initialDate;
+    @Column(name = "final_date", nullable = false)
+    private LocalDateTime finalDate;
+    
+    // Getters and Setters
+    
+    // HashCode and Equals
+    
+}
+
+
+Repository
+----------------------------------------------------------------------------------------------------
+- Criar o pacote 'com.ctseducare.taskbook.repository'
+
+- Criar o arquivo 'TaskRepository.java'
+
+public interface TaskRepository extends JpaRepository<Task, Integer> {
+
+}
+
+

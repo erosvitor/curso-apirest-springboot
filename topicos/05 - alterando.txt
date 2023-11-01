@@ -1,0 +1,69 @@
+====================================================================================================
+CURSO API REST SPRING BOOT - ALTERANDO
+====================================================================================================
+
+
+Serviço
+----------------------------------------------------------------------------------------------------
+- Adicionar o método 'update' no arquivo 'TaskService.java'
+
+    ...
+    public Task update(Task task) {
+        return repository.save(task);
+    }
+    ...
+    
+
+Controller
+----------------------------------------------------------------------------------------------------
+- Adicionar o endpoint 'update' na classe 'TaskController'
+
+    ...
+    @PutMapping
+    public ResponseEntity<Task> update(@RequestBody Task task) {
+        return ResponseEntity.ok(service.update(task));
+    }
+    ...
+    
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Reiniciar a aplicação
+
+- Utilizando o Postman
+
+  - Criar uma requisição PUT
+
+    URL:
+  
+      http://localhost:8080/task
+   
+    Payload:
+  
+      {
+        "id": 1,
+        "description": "Finalizar curso API REST com Spring Boot",
+        "initialDate": "2023-09-22T08:00:00",
+        "finalDate": "2023-09-25T18:00:00"
+      }
+
+    Resposta:
+  
+      {
+        "id": 1,
+        "description": "Finalizar curso API REST com Spring Boot",
+        "initialDate": "2023-09-22T08:00:00",
+        "finalDate": "2023-09-25T18:00:00"
+      }
+
+- Utilizando o cURL
+
+  curl --location --request PUT 'http://localhost:8080/tasks' \
+       --header 'Content-Type: application/json' \
+       --data ' {
+           "id": 2,
+           "description": "Finalizar curso API REST com Spring Boot",
+           "initialDate": "2023-09-22T08:00:00",
+           "finalDate": "2023-09-25T18:00:00"
+        }'
+

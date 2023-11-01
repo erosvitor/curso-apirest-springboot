@@ -1,0 +1,97 @@
+====================================================================================================
+CURSO API REST SPRING BOOT - PROJETO
+====================================================================================================
+
+
+Projeto
+----------------------------------------------------------------------------------------------------
+- Abrir o 'Spring Tools Suite'
+
+- Selecionar File > New > Other > Maven Project 
+
+- Marcar a opção 'Create a simple project' e clicar no botão 'Next'
+
+- Preencher os seguintes campos
+
+  Group Id: com.ctseducare
+  Artifact Id: taskbook
+  Version: 0.0.1-SNAPSHOT
+  Packaging: jar
+
+- Clicar no botão 'Finish'
+
+
+Configurações
+----------------------------------------------------------------------------------------------------
+- Adicionar as seguintes linhas no arquivo 'pom.xml'
+
+  ...
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.1.1</version>
+    <relativePath>pom</relativePath>
+  </parent>
+	  
+  <properties>
+    <java.version>17</java.version>
+  </properties>
+  
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+
+Endpoint status
+----------------------------------------------------------------------------------------------------
+- Criar o pacote 'com.ctseducare.taskbook.controller'
+ 
+- Criar o arquivo 'TaskController.java'
+
+@RestController
+@RequestMapping(path = "/tasks")
+public class TaskController {
+
+  @GetMapping("/status")
+  String status() {
+    return "I am UP!";
+  }
+
+}
+
+
+Função principal
+----------------------------------------------------------------------------------------------------
+- Criar o pacote 'com.ctseducare.taskbook'
+
+- Criar o arquivo 'StartApplication.java'
+
+@SpringBootApplication
+public class StartApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(StartApplication.class, args);
+    }
+    
+}
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Iniciar a aplicação
+
+- Utilizando um navegador Web acessar o endereço
+
+  http://localhost:8080/tasks/status
+  
+  Obs: A frase 'I am UP!' deve ser exibida no navegador.
+
+

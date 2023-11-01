@@ -1,0 +1,113 @@
+====================================================================================================
+CURSO API REST SPRING BOOT - EXCEÇÕES
+====================================================================================================
+
+
+Exceção
+----------------------------------------------------------------------------------------------------
+- Criar o pacote 'com.ctseducare.taskbook.exception'
+
+- Criar o arquivo 'ResourceNotFoundException.java'
+
+@ResponseStatus(HttpStatus.NOT_FOUND)
+public class ResourceNotFoundException extends RuntimeException {
+
+    private static final long serialVersionUID = 1L;
+
+    public ResourceNotFoundException(String exception) {
+        super(exception);
+    }
+
+}
+
+
+Response
+----------------------------------------------------------------------------------------------------
+- Criar o pacote 'com.ctseducare.taskbook.exception.response'
+
+- Criar o arquivo 'ExceptionResponse.java'
+
+public class ExceptionResponse implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private int error;
+    private String reason;
+
+    public ExceptionResponse(int error, String reason) {
+        this.error = error;
+        this.reason = reason;
+    }
+
+    public int getError() {
+        return error;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+}
+
+
+Handle
+----------------------------------------------------------------------------------------------------
+- Criar o pacote 'com.ctseducare.taskbook.exception.handle'
+
+- Criar o arquivo 'ResponseEntityExceptionHandlerCustom.java'
+
+@ControllerAdvice
+public class ResponseEntityExceptionHandlerCustom extends ResponseEntityExceptionHandler {
+
+  @ExceptionHandler(ResourceNotFoundException.class)
+  public final ResponseEntity<ExceptionResponse> handleResourceNotFoundExceptions(Exception ex, WebRequest request) {
+    ExceptionResponse exceptionResponse = new ExceptionResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
+    return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
+  }
+  
+}
+
+
+Método update
+----------------------------------------------------------------------------------------------------
+- Alterar o método 'update' na classe 'TaskService' conforme abaixo
+
+    ...
+    public Task update(Task task) {
+        repository
+          .findById(task.getId())
+          .orElseThrow(() -> new ResourceNotFoundException("Task does not exist!"));
+        return repository.save(task);
+    }
+    ...
+
+
+Método delete
+----------------------------------------------------------------------------------------------------
+- Alterar o método 'delete' na classe 'TaskService' conforme abaixo
+
+    ...
+    public void delete(Integer id) {
+        repository
+          .findById(id)
+          .orElseThrow(() -> new ResourceNotFoundException("Task does not exist!"));
+        repository.deleteById(id);
+    }
+    ...
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Reiniciar a aplicação
+
+- Utilizando o Postman
+
+  - Realizar uma requisição para excluir uma tarefa que não existe
+
+    Obs: O usuário receberá a seguinte resposta:
+  
+      {
+        "error": 404,
+        "reason": "Task does not exist!"
+      }
+

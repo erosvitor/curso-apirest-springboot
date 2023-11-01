@@ -1,0 +1,28 @@
+====================================================================================================
+CURSO API REST SPRING BOOT - BUILD
+====================================================================================================
+
+
+Plugin
+----------------------------------------------------------------------------------------------------
+- Adicionar o seguinte plugin
+
+  ...
+  <plugin>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-maven-plugin</artifactId>
+  </plugin>
+  ...
+
+
+Build
+----------------------------------------------------------------------------------------------------
+- Construir o pacote
+
+  $ mvn package
+
+- Run the application
+
+  $ java -jar ./target/taskbook-0.0.1-SNAPSHOT.jar
+
+

@@ -1,0 +1,59 @@
+====================================================================================================
+CURSO API REST SPRING BOOT - SELECIONANDO
+====================================================================================================
+
+
+Serviço
+----------------------------------------------------------------------------------------------------
+- Adicionar o método 'findAll' no arquivo 'TaskService.java'
+
+    ...
+    public List<Task> findAll() {
+        return repository.findAll();
+    }
+    ...
+    
+
+Controller
+----------------------------------------------------------------------------------------------------
+- Adicionar o endpoint 'findAll' na classe 'TaskController'
+
+    ...
+    @GetMapping
+    public ResponseEntity<List<Task>> findAll() {
+        return ResponseEntity.ok(service.findAll());
+    }
+    ...
+    
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Reiniciar a aplicação
+
+- Utilizando o Postman
+
+  - Criar uma requisição GET
+
+    URL:
+  
+      http://localhost:8080/tasks
+  
+    Payload:
+  
+      N.A.
+
+    Resposta:
+  
+    [
+      {
+        "id": 1,
+        "description": "Finalizar curso API REST com Spring Boot",
+        "initialDate": "2023-09-22T08:00:00",
+        "finalDate": "2023-09-22T18:00:00"
+      }
+    ]
+
+- Utilizando o cURL
+
+  curl --location 'http://localhost:8080/tasks'
+

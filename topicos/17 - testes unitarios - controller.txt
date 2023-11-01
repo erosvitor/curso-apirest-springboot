@@ -1,0 +1,257 @@
+====================================================================================================
+CURSO API REST SPRING BOOT - TESTES UNITÁRIOS - CONTROLLER
+====================================================================================================
+
+
+Pacote
+----------------------------------------------------------------------------------------------------
+- Criar o pacote 'com.ctseducare.taskbook.unittest.controller' no folder 'src/test/java'
+
+
+Base para testes
+----------------------------------------------------------------------------------------------------
+- Criar a classe 'TaskControllerTest.java' 
+
+@WebMvcTest
+public class TaskControllerTest {
+	
+	@Autowired
+	private MockMvc mockMvc;
+	
+	@Autowired
+	private ObjectMapper objectMapper;
+	
+	@MockBean
+	private TaskService service;
+
+}
+
+
+Teste unitário para o método 'status' (GET)
+----------------------------------------------------------------------------------------------------
+
+	@Test
+	void testStatus() throws Exception {
+		// When
+		var request = MockMvcRequestBuilders.get("/tasks/status");
+
+		ResultActions response = mockMvc.perform(request);
+		
+		// Then
+		response
+		  //.andDo(print())
+		  .andExpect(status().is(200));
+	}
+
+	
+Teste unitário para o método 'insert' (POST)
+----------------------------------------------------------------------------------------------------
+
+	@Test
+	void testPost() throws Exception {
+		Task taskToInsert = new Task();
+		taskToInsert.setDescription("Tarefa 1");
+		taskToInsert.setInitialDate(LocalDateTime.of(2023, 9, 25, 8, 0, 0));
+		taskToInsert.setFinalDate(LocalDateTime.of(2023, 9, 25, 18, 0, 0));
+
+		Task taskInserted = new Task();
+		taskInserted.setId(1);
+		taskInserted.setDescription("Tarefa 1");
+		taskInserted.setInitialDate(LocalDateTime.of(2023, 9, 25, 8, 0, 0));
+		taskInserted.setFinalDate(LocalDateTime.of(2023, 9, 25, 18, 0, 0));
+
+		// Given
+		given(service.insert(taskToInsert)).willReturn(taskInserted);
+
+		// When
+		var request = MockMvcRequestBuilders
+				.post("/tasks")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(taskToInsert));
+
+		ResultActions response = mockMvc.perform(request);
+		
+		// Then
+		response
+		  //.andDo(print())
+		  .andExpect(status().is(200))
+		  .andExpect(jsonPath("$.id", is(taskInserted.getId())));
+	}
+
+
+Teste unitário para o método 'insert' (POST) com falha nos dados
+----------------------------------------------------------------------------------------------------
+
+	@Test
+	void testPostWithDataValidationFailure() throws Exception {
+		Task taskToInsert = new Task();
+		taskToInsert.setDescription("Tar");
+		taskToInsert.setInitialDate(LocalDateTime.of(2023, 9, 25, 8, 0, 0));
+		taskToInsert.setFinalDate(null);
+
+		// When
+		var request = MockMvcRequestBuilders
+				.post("/tasks")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(taskToInsert));
+
+		ResultActions response = mockMvc.perform(request);
+		
+		// Then
+		response
+		  //.andDo(print())
+		  .andExpect(status().is(400))
+		  .andExpect(jsonPath("$.reason[0]", containsString("Descrição deve ter pelo menos 5 caracteres")))
+		  .andExpect(jsonPath("$.reason[1]", containsString("O campo 'final_date' é obrigatório")));
+	}
+
+
+Teste unitário para o método 'findAll' (GET)
+----------------------------------------------------------------------------------------------------
+
+	@Test
+	void testGet() throws Exception {
+		Task task = new Task();
+		task.setId(1);
+		task.setDescription("Tarefa 1");
+		task.setInitialDate(LocalDateTime.of(2023, 9, 25, 8, 0, 0));
+		task.setFinalDate(LocalDateTime.of(2023, 9, 25, 18, 0, 0));
+
+		List<Task> tasks = new ArrayList<>();
+		tasks.add(task);
+
+		// Given
+		given(service.findAll()).willReturn(tasks);
+
+		// When
+		var request = MockMvcRequestBuilders.get("/tasks");
+		ResultActions response = mockMvc.perform(request);
+
+		// Then
+		response
+              //.andDo(print())
+	      .andExpect(status().is(200))
+	      .andExpect(jsonPath("$.size()", is(tasks.size())));
+	}
+
+
+Teste unitário para o método 'update' (PUT)
+----------------------------------------------------------------------------------------------------
+
+	@Test
+	void testPut() throws Exception {
+		Task taskToUpdate = new Task();
+		taskToUpdate.setId(1);
+		taskToUpdate.setDescription("Tarefa 1");
+		taskToUpdate.setInitialDate(LocalDateTime.of(2023, 9, 25, 8, 0, 0));
+		taskToUpdate.setFinalDate(LocalDateTime.of(2023, 9, 28, 18, 0, 0));
+
+		Task taskUpdated = new Task();
+		taskUpdated.setId(1);
+		taskUpdated.setDescription("Tarefa 1");
+		taskUpdated.setInitialDate(LocalDateTime.of(2023, 9, 25, 8, 0, 0));
+		taskUpdated.setFinalDate(LocalDateTime.of(2023, 9, 28, 18, 0, 0));
+
+		// Given
+		given(service.update(taskToUpdate)).willReturn(taskUpdated);
+
+		// When
+		var request = MockMvcRequestBuilders
+				.put("/tasks")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(taskToUpdate));
+
+		ResultActions response = mockMvc.perform(request);
+
+		// Then
+		response
+                  //.andDo(print())
+		  .andExpect(status().is(200))
+		  .andExpect(jsonPath("$.id", is(taskUpdated.getId())))
+		  .andExpect(jsonPath("$.description", is(taskUpdated.getDescription())));
+	}
+
+
+Teste unitário para o método 'update' (PUT) com tarefa não existente
+----------------------------------------------------------------------------------------------------
+
+	@Test
+	void testPutWithTaskDoesNotExist() throws Exception {
+		Task task = new Task();
+		task.setId(2);
+		task.setDescription("Tarefa 2");
+		task.setInitialDate(LocalDateTime.of(2023, 9, 25, 8, 0, 0));
+		task.setFinalDate(LocalDateTime.of(2023, 9, 28, 18, 0, 0));
+
+		// Given
+		Exception exception = new ResourceNotFoundException("Task does not exist!");
+		given(service.update(task)).willThrow(exception);
+
+		// When
+		var request = MockMvcRequestBuilders
+				.put("/tasks")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(task));
+
+		ResultActions response = mockMvc.perform(request);
+
+		// Then
+		response
+		  //.andDo(print())
+		  .andExpect(status().is(404))
+		  .andExpect(jsonPath("$.reason", is("Task does not exist!")));
+	}
+
+
+Teste unitário para o método 'delete' (DELETE)
+----------------------------------------------------------------------------------------------------
+
+	@Test
+	void testDelete() throws Exception {
+		int taskId = 1;
+		
+		Task taskDeleted = new Task();
+		taskDeleted.setId(1);
+		taskDeleted.setDescription("Tarefa 1");
+		taskDeleted.setInitialDate(LocalDateTime.of(2023, 9, 25, 8, 0, 0));
+		taskDeleted.setFinalDate(LocalDateTime.of(2023, 9, 28, 18, 0, 0));
+
+		// Given
+		given(service.delete(taskId)).willReturn(taskDeleted);
+
+		// When
+		var request = MockMvcRequestBuilders.delete("/tasks/{id}", taskId);
+
+		ResultActions response = mockMvc.perform(request);
+
+		// Then
+		response
+		  //.andDo(print())
+		  .andExpect(status().isOk());
+	}
+
+
+Teste unitário para o método 'delete' (DELETE) com tarefa não existente
+----------------------------------------------------------------------------------------------------
+
+	@Test
+	void testDeleteWithTaskDoesNotExist() throws Exception {
+		int taskId = 2;
+
+		// Given
+		Exception exception = new ResourceNotFoundException("Task does not exist!");
+		given(service.delete(taskId)).willThrow(exception);
+
+		// When
+		var request = MockMvcRequestBuilders.delete("/tasks/{id}", taskId);
+
+		ResultActions response = mockMvc.perform(request);
+
+		// Then
+		response
+		  //.andDo(print())
+		  .andExpect(status().is(404))
+		  .andExpect(jsonPath("$.reason", is("Task does not exist!")));
+	}
+
+
