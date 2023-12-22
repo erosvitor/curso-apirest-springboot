@@ -123,11 +123,11 @@ Customizando a resposta dos endpoints
     @Operation(summary = "Registra uma tarefa", description = "Após a tarefa ser registrada é retornado os dados da tarefa com o identificador preenchido.")
     @ApiResponses(
     	value = {
-            @ApiResponse(responseCode = "200", description = "Dados da tarefa com o identificador preenchido", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Task.class))),
+            @ApiResponse(responseCode = "201", description = "Dados da tarefa com o identificador preenchido", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Task.class))),
             @ApiResponse(responseCode = "400", description = "Erro informando problemas com os dados da requisição", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))),
         }
     )
-    public ResponseEntity<Task> insert(@Valid @RequestBody Task task) {
+    public ResponseEntity<Task> create(@Valid @RequestBody Task task) {
     ...
     
     @GetMapping(produces = "application/json")

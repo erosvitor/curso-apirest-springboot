@@ -31,8 +31,8 @@ Controller
     TaskService service;
     
     @PostMapping
-    public ResponseEntity<Task> create(@RequestBody Task task) {
-        return ResponseEntity.ok(service.create(task));
+    public ResponseEntity<Task> create(@Valid @RequestBody Task task) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(task));
     }
 
 

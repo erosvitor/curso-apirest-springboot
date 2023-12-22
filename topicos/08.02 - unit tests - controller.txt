@@ -73,7 +73,7 @@ Teste unitário para o método 'create' (POST)
 		// Then
 		response
 		  //.andDo(print())
-		  .andExpect(status().is(200))
+		  .andExpect(status().is(HttpStatus.CREATED.value()))
 		  .andExpect(jsonPath("$.id", is(taskCreated.getId())));
 	}
 
