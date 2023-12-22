@@ -5,10 +5,10 @@ CURSO API REST SPRING BOOT - CRUD - READ
 
 Serviço
 ----------------------------------------------------------------------------------------------------
-- Adicionar o método 'findAll' no arquivo 'TaskService.java'
+- Adicionar o método 'readAll' no arquivo 'TaskService.java'
 
     ...
-    public List<Task> findAll() {
+    public List<Task> readAll() {
         return repository.findAll();
     }
     ...
@@ -16,12 +16,12 @@ Serviço
 
 Controller
 ----------------------------------------------------------------------------------------------------
-- Adicionar o endpoint 'findAll' na classe 'TaskController'
+- Adicionar o endpoint 'readAll' na classe 'TaskController'
 
     ...
     @GetMapping
-    public ResponseEntity<List<Task>> findAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<List<Task>> readAll() {
+        return ResponseEntity.ok(service.readAll());
     }
     ...
     

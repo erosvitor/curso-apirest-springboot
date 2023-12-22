@@ -22,32 +22,31 @@ public class TaskServiceTest {
 }
 
 
-Implementando teste do método 'insert'
+Implementando teste do método 'create'
 ----------------------------------------------------------------------------------------------------
 
 	@Test
-	void testInsert() {
-		Task taskToInsert = new Task();
-		taskToInsert.setDescription("Tarefa 1");
-		taskToInsert.setInitialDate(LocalDateTime.of(2023, 9, 25, 8, 0, 0));
-		taskToInsert.setFinalDate(LocalDateTime.of(2023, 9, 25, 18, 0, 0));
+	void testCreate() {
+		Task taskToCreate = new Task();
+		taskToCreate.setDescription("Tarefa 1");
+		taskToCreate.setInitialDate(LocalDateTime.of(2023, 9, 25, 8, 0, 0));
+		taskToCreate.setFinalDate(LocalDateTime.of(2023, 9, 25, 18, 0, 0));
 
-		Task taskInserted = new Task();
-		taskInserted.setId(1);
-		taskInserted.setDescription("Tarefa 1");
-		taskInserted.setInitialDate(LocalDateTime.of(2023, 9, 25, 8, 0, 0));
-		taskInserted.setFinalDate(LocalDateTime.of(2023, 9, 25, 18, 0, 0));
+		Task taskCreated = new Task();
+		taskCreated.setId(1);
+		taskCreated.setDescription("Tarefa 1");
+		taskCreated.setInitialDate(LocalDateTime.of(2023, 9, 25, 8, 0, 0));
+		taskCreated.setFinalDate(LocalDateTime.of(2023, 9, 25, 18, 0, 0));
 		
-		when(repository.save(taskToInsert)).thenReturn(taskInserted);
-		Task result = service.insert(taskToInsert);
+		when(repository.save(taskToCreate)).thenReturn(taskCreated);
+		Task result = service.create(taskToCreate);
 		
 		assertNotNull(result);
-		assertEquals(result.getId(), taskInserted.getId());
+		assertEquals(result.getId(), taskCreated.getId());
 	}
 
 
-
-Implementando teste do método 'findAll'
+Implementando teste do método 'readAll'
 ----------------------------------------------------------------------------------------------------
 
 	@Test

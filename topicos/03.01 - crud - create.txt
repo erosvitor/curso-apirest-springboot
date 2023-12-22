@@ -15,7 +15,7 @@ public class TaskService {
     @Autowired
     TaskRepository repository;
     
-    public Task insert(Task task) {
+    public Task create(Task task) {
         return repository.save(task);
     }
     
@@ -31,8 +31,8 @@ Controller
     TaskService service;
     
     @PostMapping
-    public ResponseEntity<Task> insert(@RequestBody Task task) {
-        return ResponseEntity.ok(service.insert(task));
+    public ResponseEntity<Task> create(@RequestBody Task task) {
+        return ResponseEntity.ok(service.create(task));
     }
 
 
