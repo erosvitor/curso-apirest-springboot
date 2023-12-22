@@ -20,9 +20,9 @@ Controller
 
     ...
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable Integer id) {
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Integer id) {
         service.delete(id);
-        return ResponseEntity.ok("Item excluído");
     }
     ...
     
@@ -45,7 +45,7 @@ Verificando
 
     Resposta:
   
-      Item excluído
+      204 No Content
 
 - Utilizando o cURL
 
