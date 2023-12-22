@@ -20,8 +20,9 @@ Controller
 
     ...
     @PutMapping
-    public ResponseEntity<Task> update(@RequestBody Task task) {
-        return ResponseEntity.ok(service.update(task));
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void update(@Valid @RequestBody Task task) {
+    	service.update(task);
     }
     ...
     
@@ -49,12 +50,7 @@ Verificando
 
     Resposta:
   
-      {
-        "id": 1,
-        "description": "Finalizar curso API REST com Spring Boot",
-        "initialDate": "2023-09-22T08:00:00",
-        "finalDate": "2023-09-25T18:00:00"
-      }
+      204 No Content
 
 - Utilizando o cURL
 

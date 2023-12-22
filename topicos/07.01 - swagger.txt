@@ -83,7 +83,7 @@ Customizando os media types dos endpoints
   
   @GetMapping(produces = "application/json")
   
-  @PutMapping(consumes = "application/json", produces = "application/json")
+  @PutMapping(consumes = "application/json")
   
   @DeleteMapping(path = "/{id}", produces="text/plain")
   ...
@@ -104,8 +104,9 @@ Customizando a descrição dos endpoints
   public ResponseEntity<List<Task>> findAll() {
   ...
     
-  @PutMapping(consumes = "application/json", produces = "application/json")
-  @Operation(summary = "Altera dados de uma tarefa", description = "Após os dados serem alterados é retornado os dados da tarefa atualizados.")
+  @PutMapping(consumes = "application/json")
+  @ResponseStatus(value = HttpStatus.NO_CONTENT)
+  @Operation(summary = "Altera dados de uma tarefa", description = "Após os dados serem alterados é retornado o status 204 sem conteúdo.")
   public ResponseEntity<Task> update(@Valid @RequestBody Task task) {
   ...
     
@@ -140,11 +141,12 @@ Customizando a resposta dos endpoints
     public ResponseEntity<List<Task>> findAll() {
     ...
     
-    @PutMapping(consumes = "application/json", produces = "application/json")
-    @Operation(summary = "Altera dados de uma tarefa", description = "Após os dados serem alterados é retornado os dados da tarefa atualizados.")
+    @PutMapping(consumes = "application/json")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @Operation(summary = "Altera dados de uma tarefa", description = "Após os dados serem alterados é retornado o status 204 sem conteúdo.")
     @ApiResponses(
         value = {
-            @ApiResponse(responseCode = "200", description = "Dados da tarefa atualizados", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Task.class))),
+            @ApiResponse(responseCode = "204"),
             @ApiResponse(responseCode = "400", description = "Erro informando problemas com os dados da requisição e/ou informando que a tarefa não existe.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))),
         }
     )
