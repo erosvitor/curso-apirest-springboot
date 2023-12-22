@@ -1,5 +1,5 @@
 ====================================================================================================
-CURSO API REST SPRING BOOT - DEPLOY - SERVIDOR TRADICIONAL UBUNTU
+CURSO API REST SPRING BOOT - DEPLOY - TRADITIONAL UBUNTU SERVER
 ====================================================================================================
 
 

@@ -1,15 +1,18 @@
 ====================================================================================================
-CURSO API REST SPRING BOOT - PROBLEMA 05
+CURSO API REST SPRING BOOT - UNIT TESTS - DEPENDENCIES
 ====================================================================================================
 
 
-Problemas encontrados até o momento
+Dependência
 ----------------------------------------------------------------------------------------------------
-- As funcionalidades da API não estão protegidas por testes unitários.
+- Adicionar a dependência
 
-
-Solução
-----------------------------------------------------------------------------------------------------
-- Implementar testes unitários
+    ...
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency>	
+    ...
 
 

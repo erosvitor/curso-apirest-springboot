@@ -1,11 +1,11 @@
 ====================================================================================================
-CURSO API REST SPRING BOOT - PROJETO
+CURSO API REST SPRING BOOT - PROJECT
 ====================================================================================================
 
 
 Projeto
 ----------------------------------------------------------------------------------------------------
-- Abrir o 'Spring Tools Suite'
+- Abrir o 'Spring Tools Suite' ou 'Eclipse'
 
 - Selecionar File > New > Other > Maven Project 
 

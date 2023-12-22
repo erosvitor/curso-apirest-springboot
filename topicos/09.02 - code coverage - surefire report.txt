@@ -1,5 +1,5 @@
 ====================================================================================================
-CURSO API REST SPRING BOOT - COBERTURA DE CÓDIGO - SUREFIRE REPORT
+CURSO API REST SPRING BOOT - CODE COVERAGE - SUREFIRE REPORT
 ====================================================================================================
 
 
