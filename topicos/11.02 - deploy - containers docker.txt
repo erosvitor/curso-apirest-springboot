@@ -19,7 +19,7 @@ Preparando script do banco de dados para o Docker Compose
 
 - Criar o arquivo 'taskbook.sql'
 
-CREATE DATABASE taskbook;
+CREATE DATABASE taskbook CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci;
 
 USE taskbook;
 
@@ -29,7 +29,7 @@ CREATE TABLE tasks (
   initial_date DATETIME NOT NULL,
   final_date DATETIME NOT NULL,
   PRIMARY KEY (id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE utf8mb3_general_ci;
 
 
 Preparando o arquivo docker-compose.yml
@@ -50,7 +50,6 @@ services:
     restart: always
     environment:
       TZ: America/Sao_Paulo
-      MYSQL_DATABASE: taskbook
       MYSQL_ROOT_PASSWORD: root
       MYSQL_TCP_PORT: 3308
     ports:

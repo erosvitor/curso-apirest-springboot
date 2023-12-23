@@ -102,7 +102,7 @@ Criando a estrutura do banco de dados
     initial_date DATETIME NOT NULL,
     final_date DATETIME NOT NULL,
     PRIMARY KEY (id)
-  );
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE utf8mb3_general_ci;
 
 
 Ajustando a aplicação para utilizar o banco de dados na AWS
