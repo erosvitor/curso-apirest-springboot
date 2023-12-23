@@ -166,3 +166,11 @@ Customizando a resposta dos endpoints
     public void delete(@Parameter(description = "Identificador da tarefa.") @PathVariable Integer id) {
     ...
 
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Reiniciar a aplicação
+
+- Utilizando algum navegador de Internet, acessar o endereço
+
+  http://localhost:8080/swagger-ui/
